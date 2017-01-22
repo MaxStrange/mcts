@@ -15,6 +15,7 @@ def start_game():
     """
     global ai_module
     global game_module
+
     print("Welcome to the MCTS prototyping framework!")
     print(game_module.welcome_string())
 
@@ -29,7 +30,7 @@ def start_game():
             d = get_next_metadata()
         game_module.set_next_metadata(d)
 
-    game_module.initialize()
+    game_module.initialize(ai_module)
 
     def get_next_input():
         input_request_str = game_module.get_input_request_str()
