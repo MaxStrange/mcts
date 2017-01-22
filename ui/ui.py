@@ -29,6 +29,27 @@ def start_game():
             d = get_next_metadata()
         game_module.set_next_metadata(d)
 
+    game_module.initialize()
+
+    def get_next_input():
+        input_request_str = game_module.get_input_request_str()
+        info = input(input_request_str)
+        return info
+
+    while not game_module.game_over():
+        state_to_display = game_module.get_formatted_display()
+        print(state_to_display)
+        if game_module.players_turn():
+            while game_module.needs_more_player_input():
+                info = get_next_input()
+                while game_module.info_not_valid(info):
+                    info = get_next_input()
+                game_module.set_next_input(info)
+            game_module.take_player_turn()
+        else:
+            game_module.take_ai_turn()
+
+
 
 
 

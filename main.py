@@ -11,7 +11,6 @@ import os
 import sys
 import ui.ui as ui
 
-
 def load_module_from_path(path):
     """
     Takes a python module of the form path/to/module and returns
@@ -48,7 +47,5 @@ if __name__ == "__main__":
         ui.game_module = game_module
         ui.ai_module = ai_module
         ui.start_game()
-
-
 
 

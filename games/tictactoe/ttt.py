@@ -1,60 +1,29 @@
 """
 This is the game logic for the Tic Tac Toe game.
 """
+from games.tictactoe.metadata import MetaData
+from games.tictactoe.gamestate import GameState
 
-class MetaData:
+class ImproperUsageError(Exception):
     """
-    The meta data required for the game of Tic Tac Toe.
+    An exception type to use when the programmer has used the API
+    in an incorrect way.
     """
-    def __init__(self):
-        self.player_symbol = None
-        self.player_goes_first = None
-
-    def get_next_request_str(self):
-        if not self.player_symbol:
-            self._request = "self.player_symbol"
-            return "Player Symbol (x or o):"
-        elif self.player_goes_first is None:
-            self._request = "self.player_goes_first"
-            return "Player goes first? (y/n): "
-        else:
-            raise IndexError("Out of metadata request strings")
-
-    def needs_more_metadata(self):
-        if not self.player_symbol:
-            return True
-        elif self.player_goes_first is None:
-            return True
-        else:
-            return False
-
-    def set_next_metadata(self, d):
-        """
-        Requires that d be clean already.
-        """
-        if self._request == "self.player_symbol":
-            self.player_symbol = d
-        elif self._request == "self.player_goes_first":
-            self.player_goes_first = d
-        else:
-            raise IndexError("Out of metadata to set")
-
-    def valid(self, d):
-        """
-        Checks if d is valid, given the last item to be requested.
-        """
-        if self._request == "self.player_symbol":
-            return d == "x" or d == "o" or d == "X" or d == "O"
-        elif self._request == "self.player_goes_first":
-            return d == "y" or d == "Y" or d == "n" or d == "N"
-        else:
-            raise IndexError("Out of metadata validations")
-
-
+    pass
 
 
 # Global variables
 _metadata = MetaData()
+_gamestate = GameState()
+
+
+def get_input_request_str():
+    """
+    Returns the next string that the UI should print in order to request
+    the next player turn information.
+    """
+    global _gamestate
+    return _gamestate.get_next_input_request_str()
 
 
 def get_next_metadata_request_str():
@@ -64,6 +33,18 @@ def get_next_metadata_request_str():
     """
     global _metadata
     return _metadata.get_next_request_str()
+
+
+def initialize():
+    """
+    Runs any initialization code necessary for the game.
+    This is run after all meta data is collected.
+    """
+    if not _metadata:
+        raise ImproperUsageError("Initialize should only be called " +\
+                "after metadata has been fully collected")
+    else:
+        pass
 
 
 def metadata_not_valid(d):
