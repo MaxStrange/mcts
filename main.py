@@ -36,13 +36,13 @@ if __name__ == "__main__":
         except Exception as e:
             print("Problem loading game module.")
             print(e)
-            exit(1)
+            raise e
         try:
             ai_module = load_module_from_path(sys.argv[2])
         except Exception as e:
             print("Problem loading ai module.")
             print(e)
-            exit(1)
+            raise e
 
         ui.game_module = game_module
         ui.ai_module = ai_module

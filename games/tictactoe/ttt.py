@@ -3,6 +3,7 @@ This is the game logic for the Tic Tac Toe game.
 """
 from games.tictactoe.metadata import MetaData
 from games.tictactoe.gamestate import GameState
+import os
 
 
 class ImproperUsageError(Exception):
@@ -15,15 +16,27 @@ class ImproperUsageError(Exception):
 
 # Global variables
 _metadata = MetaData()
-_gamestate = GameState()
+_gamestate = None
 
 
 def game_over():
     """
     Returns True if the game is over, False if it is not.
     """
-    global _gamestate
     return _gamestate.game_over()
+
+
+def get_ending_msg():
+    """
+    Returns the ending message (such as who won).
+    """
+    winner = _gamestate.get_winner()
+    if not winner:
+        s = "IT'S A DRAW" + os.linesep
+    else:
+        s = winner + " WINS!" + os.linesep
+    s += "Thanks for playing!"
+    return s
 
 
 def get_formatted_display():
@@ -57,7 +70,8 @@ def info_not_valid(info):
     Returns True if the given info is NOT valid for the game state's
     current request for player info.
     """
-    return not _gamestate.info_valid(info), msg
+    valid, err_msg = _gamestate.info_valid(info)
+    return (not valid, err_msg)
 
 
 def initialize(ai_module):
@@ -69,6 +83,7 @@ def initialize(ai_module):
         raise ImproperUsageError("Initialize should only be called " +\
                 "after metadata has been fully collected")
     else:
+        global _gamestate
         _gamestate = GameState(_metadata, ai_module)
 
 

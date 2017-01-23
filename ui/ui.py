@@ -53,6 +53,12 @@ def start_game():
         else:
             game_module.take_ai_turn()
 
+    ending_state = game_module.get_formatted_display()
+    print(ending_state)
+
+    ending_message = game_module.get_ending_msg()
+    print(ending_message)
+
 
 
 
