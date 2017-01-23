@@ -57,7 +57,7 @@ def info_not_valid(info):
     Returns True if the given info is NOT valid for the game state's
     current request for player info.
     """
-    return not _gamestate.info_valid(info)
+    return not _gamestate.info_valid(info), msg
 
 
 def initialize(ai_module):
@@ -69,9 +69,7 @@ def initialize(ai_module):
         raise ImproperUsageError("Initialize should only be called " +\
                 "after metadata has been fully collected")
     else:
-        _gamestate = GameState()
-        _gamestate.metadata = _metadata
-        _gamestate.ai = ai_module
+        _gamestate = GameState(_metadata, ai_module)
 
 
 def metadata_not_valid(d):
@@ -101,7 +99,7 @@ def players_turn():
     Returns True if it is the player's turn, False if it is the
     computer's turn instead.
     """
-    return _gamestate.players_turn()
+    return _gamestate.players_turn
 
 
 def set_next_input(info):

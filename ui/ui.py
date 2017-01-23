@@ -43,8 +43,11 @@ def start_game():
         if game_module.players_turn():
             while game_module.needs_more_player_input():
                 info = get_next_input()
-                while game_module.info_not_valid(info):
+                invalid_move, err_msg = game_module.info_not_valid(info)
+                while invalid_move:
+                    print(err_msg)
                     info = get_next_input()
+                    invalid_move, err_msg = game_module.info_not_valid(info)
                 game_module.set_next_input(info)
             game_module.take_player_turn()
         else:
