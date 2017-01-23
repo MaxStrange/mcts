@@ -9,6 +9,7 @@ class MetaData:
     def __init__(self):
         self.player_symbol = None
         self.player_goes_first = None
+        self.ai_symbol = None
 
     def get_next_request_str(self):
         if not self.player_symbol:
@@ -34,6 +35,10 @@ class MetaData:
         """
         if self._request == "self.player_symbol":
             self.player_symbol = d
+            if d == 'x':
+                self.ai_symbol = 'o'
+            else:
+                self.ai_symbol = 'x'
         elif self._request == "self.player_goes_first":
             self.player_goes_first = True if d == 'y' else False
         else:

@@ -30,7 +30,7 @@ class Node:
         """
         return self.state.possible_moves()
 
-    def derive_child(action):
+    def derive_child(self, action):
         """
         Derives a new Node from this one and the given action.
         """
@@ -49,10 +49,10 @@ class Node:
 
     def is_not_fully_expanded(self):
         """
-        Returns whether or not all possible children have been
-        added to this Node.
+        Returns True unless all possible children have been added to this
+        Node's children list.
         """
-        return len(self.available_actions()) == len(self.children)
+        return len(self.available_actions()) != len(self.children)
 
 
 

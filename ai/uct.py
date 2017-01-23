@@ -14,9 +14,12 @@ def get_best_move(cur_state, reward_function):
     """
     Gets the AI's best move. Or at least, gets what it thinks is its
     best move.
-    The reward_function parameter is a function that evaluates a
-    game state with a value in the interval [0, 1], where 0 is bad
-    and 1 is good.
+    The reward_runction parameter is a function that evaluates a terminal
+    board position (a game over gamestate) and returns a value in the interval
+    [0, 1], where lower values indicate a bad outcome for the AI, and higher
+    values indicated a good outcome for the AI.
+    Note that this function is only ever evaluated on TERMINAL game states,
+    so it is fine if it is undefined for non-terminal game states.
     """
     return _uct_search(cur_state, reward_function)
 
@@ -34,7 +37,7 @@ def _uct_search(game_state, reward_function):
         delta = _default_policy(v.state, reward_function)
         print("Delta: ", str(delta))
         _back_up(v, delta)
- 
+
     # This will usually, but not always, return the action that leads
     # to the child with the highest reward. It COULD (since Cp is set
     # to zero for this call) return the node that is most visited instead.
@@ -65,6 +68,7 @@ def _back_up(v, delta):
 
 
 def _best_child(v, c):
+    print("Best child function given node: ", str(v))
     def valfunc(v_prime, v):
         left = v_prime.total_reward / v_prime.num_times_visited
         right = c * math.sqrt((2 * math.ln(v.num_times_visited))\
@@ -72,6 +76,7 @@ def _best_child(v, c):
         return left + right
     values_and_nodes = [(valfunc(v_prime, v), v_prime) for v_prime\
             in v.children]
+    print("Values and nodes: ", str(values_and_nodes))
     max_val = max(values_and_nodes, key=lambda tup: tup[0])
     for tup in values_and_nodes:
         if tup[0] == max_val:
@@ -110,7 +115,7 @@ def _delta_function(delta, v):
 
 
 def _expand(v):
-    available_actions = v.state.available_actions()
+    available_actions = v.available_actions()
     action_to_try = _choose_untried_action_from(available_actions)
     v_prime = v.derive_child(action_to_try)
     return v_prime
@@ -133,7 +138,6 @@ def _within_computational_budget(start):
     """
     elapsed_time = process_time() - start
     return elapsed_time < 0.5
-    
 
 
 

@@ -1,6 +1,7 @@
 """
 Module to hold the Tic Tac Toe GameState class.
 """
+import copy
 from games.tictactoe.board import Board
 import os
 
@@ -23,6 +24,18 @@ class GameState:
         for key, val in self.__dict__.items():
             s += os.linesep + "    " + key + ": " + str(val)
         return s
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            # We can't serialize _ai because it is a module
+            if k == "_ai":
+                setattr(result, k, v)
+            else:
+                setattr(result, k, copy.deepcopy(v, memo))
+        return result
 
     def current_player_symbol(self):
         """
@@ -189,43 +202,16 @@ def _evaluation_function(state):
     """
     Evaluates how good the position is for the current player.
     """
-    heuristic_array = [
-                        [    0, 10, 100, 1000],
-                        [  -10,  0,   0,    0],
-                        [ -100,  0,   0,    0],
-                        [-1000,  0,   0,    0]
-                      ]
-
-    xspots = 0
-    ospots = 0
-    def eval_spot(spot):
-        if spot == 'x':
-            xspots += 1
-        elif spot == 'o':
-            ospots += 1
-
-    for row in state._board.rows:
-        for spot in row:
-            eval_spot(spot)
-    score += heuristic_array[xspots][ospots]
-
-    xspots = 0
-    ospots = 0
-    for col in state._board._cols():
-        for spot in col:
-            eval_spot(spot)
-    score += heuristic_array[xspots][ospots]
-
-    xspots = 0
-    ospots = 0
-    for dia in state._board._diagonals():
-        for spot in dia:
-            eval_spot(spot)
-    score += heuristic_array[xspots][ospots]
-    # Score is positive for x, negative for o
-    if state.current_player_symbol() == 'x':
-        return score
+    print("State to evaluate: ")
+    print(str(state))
+    if state._metadata.ai_symbol == 'x' and state.winner == 'x':
+        return 1.0
+    elif state._metadata.ai_symbol == 'o' and state.winner = 'o':
+        return 1.0
+    elif state._metadata.ai_symbol == 'x' and state.winner == 'o':
+        return 0.0
+    elif state._metadata.ai_symbol == 'o' and state.winner == 'x':
+        return 0.0
     else:
-        return score * -1
-
+        return 0.5
 
