@@ -52,6 +52,10 @@ class GameState:
         """
         there_is_a_winner, winner = self._board.three_in_a_row()
         self.winner = winner
+        if len(self.possible_moves()) == 0:
+            # There is a draw, rather than a winner
+            there_is_a_winner = True
+            self.winner = ' '
         return there_is_a_winner
 
     def get_formatted_display(self):
@@ -137,6 +141,7 @@ class GameState:
         Takes the computer's turn.
         """
         move = self._ai.get_best_move(self, _evaluation_function)
+        print("Move: ", str(move))
         self._board.place(move, self._metadata.ai_symbol)
         self._move_that_derived_this_state = move
         self._incoming_move = None
@@ -204,14 +209,18 @@ def _evaluation_function(state):
     """
     print("State to evaluate: ")
     print(str(state))
+    reward = 0
     if state._metadata.ai_symbol == 'x' and state.winner == 'x':
-        return 1.0
-    elif state._metadata.ai_symbol == 'o' and state.winner = 'o':
-        return 1.0
+        reward = 1.0
+    elif state._metadata.ai_symbol == 'o' and state.winner == 'o':
+        reward = 1.0
     elif state._metadata.ai_symbol == 'x' and state.winner == 'o':
-        return 0.0
+        reward = 0.0
     elif state._metadata.ai_symbol == 'o' and state.winner == 'x':
-        return 0.0
+        reward = 0.0
     else:
-        return 0.5
+        reward = 0.5
+
+    print("Reward for this gamestate: ", str(reward))
+    return reward
 

@@ -37,8 +37,15 @@ class Node:
         child_state = copy.deepcopy(self.state)
         child_state.take_turn(action)
         child_node = Node(child_state)
+        child_node.parent = self
         self.children.append(child_node)
         return child_node
+
+    def move_that_derived_this_node(self):
+        """
+        Returns the action that created this Node's game state.
+        """
+        return self.state._move_that_derived_this_state
 
     def is_non_terminal(self):
         """

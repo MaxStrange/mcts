@@ -45,7 +45,11 @@ def _uct_search(game_state, reward_function):
     # one possible improvement is to check if the most visited root
     # action is not also the one with the highest reward, and if it isn't,
     # keep searching.
-    return _best_child(v, 0).incoming_action
+    best_child_of_root = _best_child(root, 0)
+    print("Found the best child: ", str(best_child_of_root))
+    best_move = best_child_of_root.move_that_derived_this_node()
+    print("Move that created this child: ", str(best_move))
+    return best_move
 
 
 
@@ -59,6 +63,9 @@ def _back_up(v, delta):
     Delta is the value of the terminal node that we reached through v.
     """
     while v is not None:
+        if v.parent is None:
+            print("==================Incrementing the root.===============")
+            print("Num times visited: ", str(v.num_times_visited))
         # num_times_visited is N in the algorithm
         # total_reward is Q, the total reward of all payouts so far pased
         # through this state
@@ -68,18 +75,21 @@ def _back_up(v, delta):
 
 
 def _best_child(v, c):
+    # This function should never be called on a node that has no children
+    assert(len(v.children) != 0)
+
     print("Best child function given node: ", str(v))
     def valfunc(v_prime, v):
         left = v_prime.total_reward / v_prime.num_times_visited
-        right = c * math.sqrt((2 * math.ln(v.num_times_visited))\
+        right = c * math.sqrt((2 * math.log(v.num_times_visited))\
                 / v_prime.num_times_visited)
         return left + right
     values_and_nodes = [(valfunc(v_prime, v), v_prime) for v_prime\
             in v.children]
     print("Values and nodes: ", str(values_and_nodes))
-    max_val = max(values_and_nodes, key=lambda tup: tup[0])
+    max_tup = max(values_and_nodes, key=lambda tup: tup[0])
     for tup in values_and_nodes:
-        if tup[0] == max_val:
+        if tup == max_tup:
             return tup[1]
 
     # This should never be reached
@@ -122,9 +132,11 @@ def _expand(v):
 
 
 def _tree_policy(v):
+    print("Tree policy given ", str(v))
     # This value of Cp works for rewards in the range of [0, 1]
     Cp = 1 / math.sqrt(2)
     while v.is_non_terminal():
+        print("Exploring node: ", str(v))
         if v.is_not_fully_expanded():
             return _expand(v)
         else:
