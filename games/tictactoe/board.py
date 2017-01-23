@@ -14,7 +14,8 @@ class Board:
         self._rows = [top, middle, bottom]
 
     def __str__(self):
-        s = " " * 3 + self._rows[0][0] + " | " + self._rows[0][1] + " | " +\
+        s = os.linesep
+        s += " " * 3 + self._rows[0][0] + " | " + self._rows[0][1] + " | "+\
                 self._rows[0][2]
         s += os.linesep
         s += "-----" * 3

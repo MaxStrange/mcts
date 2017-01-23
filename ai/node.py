@@ -2,6 +2,9 @@
 Module for holding the Node class.
 """
 
+import copy
+import os
+
 class Node:
     """
     This class is essentially just a GameState, but with some
@@ -14,6 +17,12 @@ class Node:
         self.total_reward = 0
         self.num_times_visited = 0
 
+    def __str__(self):
+        s = "Node: "
+        for key, val in self.__dict__.items():
+            s += os.linesep + "    " + key + ": " + str(val)
+        return s
+
     def available_actions(self):
         """
         Returns the set of available moves that could be applied to
@@ -25,7 +34,7 @@ class Node:
         """
         Derives a new Node from this one and the given action.
         """
-        child_state = self.state.deep_copy()
+        child_state = copy.deepcopy(self.state)
         child_state.take_turn(action)
         child_node = Node(child_state)
         self.children.append(child_node)
@@ -44,3 +53,10 @@ class Node:
         added to this Node.
         """
         return len(self.available_actions()) == len(self.children)
+
+
+
+
+
+
+

@@ -35,7 +35,7 @@ class MetaData:
         if self._request == "self.player_symbol":
             self.player_symbol = d
         elif self._request == "self.player_goes_first":
-            self.player_goes_first = d
+            self.player_goes_first = True if d == 'y' else False
         else:
             raise IndexError("Out of metadata to set")
 

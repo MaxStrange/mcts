@@ -2,6 +2,7 @@
 Module to hold the Tic Tac Toe GameState class.
 """
 from games.tictactoe.board import Board
+import os
 
 class GameState:
     """
@@ -16,6 +17,21 @@ class GameState:
         self._incoming_move = None
         self._move_that_derived_this_state = None
         self.winner = None
+
+    def __str__(self):
+        s = "State: "
+        for key, val in self.__dict__.items():
+            s += os.linesep + "    " + key + ": " + str(val)
+        return s
+
+    def current_player_symbol(self):
+        """
+        Gets the current player's symbol
+        """
+        if self.players_turn:
+            return self._metadata.players_symbol
+        else:
+            return self._metadata.ai_symbol
 
     def game_over(self):
         """
@@ -90,8 +106,8 @@ class GameState:
         Returns the set of all actions that lead to a legal next turn from
         the current state.
         """
-        # TODO
-        raise NotImplementedError("Possible moves needs to be implemented.")
+        return [move for move in self._action_set()\
+                if self._board.valid_move(move)]
 
     def set_next_input(self, info):
         """
@@ -107,7 +123,7 @@ class GameState:
         """
         Takes the computer's turn.
         """
-        move = self._ai.get_best_move(self)
+        move = self._ai.get_best_move(self, _evaluation_function)
         self._board.place(move, self._metadata.ai_symbol)
         self._move_that_derived_this_state = move
         self._incoming_move = None
@@ -140,6 +156,15 @@ class GameState:
         self._incoming_move = None
         self.players_turn = False
 
+    def _action_set(self):
+        """
+        Generates all possible actions. Does not pay attention to
+        whether they are legal or not for the current game state.
+        """
+        for r in range(3):
+            for c in range(3):
+                yield((r, c))
+
     def _parse_player_input(self, info):
         """
         Attempts to parse the given info object into a tuple of the form
@@ -159,5 +184,48 @@ class GameState:
             return (user_input[0], user_input[1])
 
 
+
+def _evaluation_function(state):
+    """
+    Evaluates how good the position is for the current player.
+    """
+    heuristic_array = [
+                        [    0, 10, 100, 1000],
+                        [  -10,  0,   0,    0],
+                        [ -100,  0,   0,    0],
+                        [-1000,  0,   0,    0]
+                      ]
+
+    xspots = 0
+    ospots = 0
+    def eval_spot(spot):
+        if spot == 'x':
+            xspots += 1
+        elif spot == 'o':
+            ospots += 1
+
+    for row in state._board.rows:
+        for spot in row:
+            eval_spot(spot)
+    score += heuristic_array[xspots][ospots]
+
+    xspots = 0
+    ospots = 0
+    for col in state._board._cols():
+        for spot in col:
+            eval_spot(spot)
+    score += heuristic_array[xspots][ospots]
+
+    xspots = 0
+    ospots = 0
+    for dia in state._board._diagonals():
+        for spot in dia:
+            eval_spot(spot)
+    score += heuristic_array[xspots][ospots]
+    # Score is positive for x, negative for o
+    if state.current_player_symbol() == 'x':
+        return score
+    else:
+        return score * -1
 
 

@@ -4,7 +4,10 @@ algorithm.
 """
 
 from ai.node import Node
+import copy
+import math
 import random
+from time import process_time
 
 
 def get_best_move(cur_state, reward_function):
@@ -15,15 +18,21 @@ def get_best_move(cur_state, reward_function):
     game state with a value in the interval [0, 1], where 0 is bad
     and 1 is good.
     """
-    return _uct_search(cur_state)
+    return _uct_search(cur_state, reward_function)
 
 
 def _uct_search(game_state, reward_function):
     root = Node(game_state)
 
-    while _within_computational_budget():
+    print("Root: ", str(root))
+
+    start_time = process_time()
+    while _within_computational_budget(start_time):
+        print("Still going...")
         v = _tree_policy(root)
+        print("Tree policy selected this node: ", str(v))
         delta = _default_policy(v.state, reward_function)
+        print("Delta: ", str(delta))
         _back_up(v, delta)
  
     # This will usually, but not always, return the action that leads
@@ -51,7 +60,7 @@ def _back_up(v, delta):
         # total_reward is Q, the total reward of all payouts so far pased
         # through this state
         v.num_times_visited += 1
-        v.total_reward += _delta_function(v, player)
+        v.total_reward += _delta_function(delta, v)
         v = v.parent
 
 
@@ -81,18 +90,23 @@ def _choose_untried_action_from(available_actions):
 def _default_policy(game_state, reward_function):
     while not game_state.game_over():
         # This function should be replaced with the policy network
-        action = uniform_random_choice(game_state.possible_moves())
-        game_state = game_state.deep_copy()
+        action = random.choice(game_state.possible_moves())
+        game_state = copy.deepcopy(game_state)
         game_state.take_turn(action)
     return reward_function(game_state)
 
 
-def _delta_function(v, player):
+def _delta_function(delta, v):
     """
     Denotes the component of the of the reward vector delta associated
-    with the current player p and node v
+    with the current player p at node v
     """
-    pass
+    # This may need to change in a game that is for more than two players.
+    # It should return a value that takes into account how well each
+    # player is doing - so teammates should be maximized while enemies
+    # are minimized or whatever.
+    # But for two player games, you can simply return delta.
+    return delta
 
 
 def _expand(v):
@@ -113,13 +127,13 @@ def _tree_policy(v):
     return v
 
 
-def _within_computational_budget():
+def _within_computational_budget(start):
     """
     Returns True if time still hasn't run out for the computer's turn.
     """
-    # TODO
-    return True
-
+    elapsed_time = process_time() - start
+    return elapsed_time < 0.5
+    
 
 
 
