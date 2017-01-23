@@ -141,7 +141,6 @@ class GameState:
         Takes the computer's turn.
         """
         move = self._ai.get_best_move(self, _evaluation_function)
-        print("Move: ", str(move))
         self._board.place(move, self._metadata.ai_symbol)
         self._move_that_derived_this_state = move
         self._incoming_move = None
@@ -207,8 +206,6 @@ def _evaluation_function(state):
     """
     Evaluates how good the position is for the current player.
     """
-    print("State to evaluate: ")
-    print(str(state))
     reward = 0
     if state._metadata.ai_symbol == 'x' and state.winner == 'x':
         reward = 1.0
@@ -221,6 +218,5 @@ def _evaluation_function(state):
     else:
         reward = 0.5
 
-    print("Reward for this gamestate: ", str(reward))
     return reward
 
