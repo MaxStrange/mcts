@@ -85,6 +85,14 @@ class GameState:
         # We only need a row and a column from the player
         return self._incoming_move is None
 
+    def possible_moves(self):
+        """
+        Returns the set of all actions that lead to a legal next turn from
+        the current state.
+        """
+        # TODO
+        raise NotImplementedError("Possible moves needs to be implemented.")
+
     def set_next_input(self, info):
         """
         Sets the player input that was last requested. This should only
@@ -103,6 +111,24 @@ class GameState:
         self._board.place(move, self._metadata.ai_symbol)
         self._move_that_derived_this_state = move
         self._incoming_move = None
+        self.players_turn = True
+
+    def take_turn(self, move):
+        """
+        This function can be used to take a turn when the caller does
+        not know whose turn it is or does not want to worry about it.
+        In general, this function is to be used for deriving new states
+        in a search tree, and should probably not be used as part of the
+        UI's calls.
+        """
+        if self.players_turn:
+            self._board.place(move, self._metadata.player_symbol)
+            self.players_turn = False
+        else:
+            self._board.place(move, self._metadata.ai_symbol)
+            self.players_turn = True
+        self._move_that_derived_this_state = move
+        self._incoming_move = None
 
     def take_player_turn(self):
         """
@@ -112,6 +138,7 @@ class GameState:
         self._board.place(move, self._metadata.player_symbol)
         self._move_that_derived_this_state = move
         self._incoming_move = None
+        self.players_turn = False
 
     def _parse_player_input(self, info):
         """
