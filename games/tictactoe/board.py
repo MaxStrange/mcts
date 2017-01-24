@@ -96,7 +96,7 @@ class Board:
     def _evaluate(self, spot):
         """
         Evaluates a spot, giving a 1 if it is an 'x', a -1 if it is an 'o'
-        and a 0 if it neither.
+        and a 0 if it is neither.
         """
         if spot == 'x':
             return 1
@@ -104,5 +104,6 @@ class Board:
             return -1
         else:
             return 0
+
 
 

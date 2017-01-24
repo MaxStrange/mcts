@@ -48,4 +48,3 @@ if __name__ == "__main__":
         ui.ai_module = ai_module
         ui.start_game()
 
-
