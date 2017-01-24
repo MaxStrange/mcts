@@ -11,6 +11,7 @@ class Node:
     helper functions and additional data (such as parent and children).
     """
     def __init__(self, state):
+        self.name = None
         self.state = state
         self.parent = None
         self.children = []
@@ -38,6 +39,7 @@ class Node:
         child_state.take_turn(action)
         child_node = Node(child_state)
         child_node.parent = self
+        child_node.name = self.name + "_" + str(child_node.move_that_derived_this_node())
         self.children.append(child_node)
         return child_node
 
