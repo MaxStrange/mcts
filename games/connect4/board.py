@@ -44,6 +44,7 @@ class Board:
         if cols:
             return True, winner
         diag, winner = self._check_for_four(self._cols())
+        if diag:
             return True, winner
 
         return False, None
@@ -86,7 +87,7 @@ class Board:
         Evaluates a spot, giving a 1 if it is an 'x', a -1 if it is an 'o' and
         a 0 if it is neither.
         """
-        is spot == 'x':
+        if spot == 'x':
             return 1
         elif spot == 'o':
             return -1

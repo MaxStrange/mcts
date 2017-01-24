@@ -59,7 +59,7 @@ def get_next_metadata_request_str():
     the next metadata variable that the game requires.
     """
     global _metadata
-    return _metadata.get_nezxt_request_str()
+    return _metadata.get_next_request_str()
 
 
 def info_not_valid(info):

@@ -50,7 +50,7 @@ class GameState:
         """
         Returns True if the game is over, False if it is not.
         """
-        there_is_a_winner, winner = self._board.three_in_a_row()
+        there_is_a_winner, winner = self._board.four_in_a_row()
         self.winner = winner
         if len(self.possible_moves()) == 0:
             # There is a draw, rather than a winner
