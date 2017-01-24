@@ -1,23 +1,20 @@
 """
-This is the game logic for the Tic Tac Toe game.
+This is the game logic for the Connect 4 game.
 """
-from games.tictactoe.metadata import MetaData
-from games.tictactoe.gamestate import GameState
+from games.connect4.metadata import MetaData
+from games.connect4.gamestate import GameState
 import os
 
 
 class ImproperUsageError(Exception):
     """
-    An exception type to use when the programmer has used the API
-    in an incorrect way.
+    An exception type to use when the programmer has used the API in an incorrect way.
     """
     pass
-
 
 # Global variables
 _metadata = MetaData()
 _gamestate = None
-
 
 def game_over():
     """
@@ -41,7 +38,7 @@ def get_ending_msg():
 
 def get_formatted_display():
     """
-    Returns the state of the game as string that can be printed to
+    Returns the state of the game as a string that can be printed to
     the console so that the user can understand what is currently
     happening in this game.
     """
@@ -62,7 +59,7 @@ def get_next_metadata_request_str():
     the next metadata variable that the game requires.
     """
     global _metadata
-    return _metadata.get_next_request_str()
+    return _metadata.get_nezxt_request_str()
 
 
 def info_not_valid(info):
@@ -111,8 +108,8 @@ def needs_more_player_input():
 
 def players_turn():
     """
-    Returns True if it is the player's turn, False if it is the
-    computer's turn instead.
+    Returns True if it is the player's turn, Flase if it is the computer's
+    turn instead.
     """
     return _gamestate.players_turn
 
@@ -140,17 +137,16 @@ def take_ai_turn():
 
 def take_player_turn():
     """
-    Modifies the game state so that the player has taken his/her turn.
+    Modifies the game state so that the plaher has taken his/her turn.
     """
     _gamestate.take_player_turn()
 
 
 def welcome_string():
     """
-    Returns the welcome string
+    Returns the welcome string.
     """
-    return "Welcome to Tic Tac Toe!"
-
+    return "Welcome to Connect4!"
 
 
 
