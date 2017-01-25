@@ -33,8 +33,7 @@ def start_game():
         if game_module.players_turn():
             _do_players_turn()
         else:
-            #game_module.take_ai_turn()
-            _do_players_turn()
+            game_module.take_ai_turn()
 
     ending_state = game_module.get_formatted_display()
     print(ending_state)

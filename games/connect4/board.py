@@ -28,6 +28,9 @@ class Board:
                     row_str += "|_" + spot + "_"
             row_str += "|" + nl
             s += row_str
+        rng = [str(i) for i in range(7)]
+        nums = "   ".join(rng)
+        s += nl + "  " + nums
         return s
 
     def place(self, move, symbol):
@@ -50,7 +53,7 @@ class Board:
         cols, winner = self._check_for_four(self._cols())
         if cols:
             return True, winner
-        diag, winner = self._check_for_four(self._cols())
+        diag, winner = self._check_for_four(self._diagonals())
         if diag:
             return True, winner
 
@@ -88,10 +91,12 @@ class Board:
 
     def _diagonals(self):
         for j in range(3, 9):
-            yield [self._rows[i][j - i] for i in range(len(self._rows))]
+            yield [self._rows[i][j - i] for i in range(len(self._rows))\
+                    if (j - i) < 7 and (j - i) >= 0]
 
         for j in range(-2, 3):
-            yield [self._rows[i][i + j] for i in range(len(self._rows))]
+            yield [self._rows[i][i + j] for i in range(len(self._rows))\
+                    if (i + j) < 7 and (i + j) >= 0]
 
     def _find_row_from_col(self, col_index):
         """
