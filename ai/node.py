@@ -17,6 +17,7 @@ class Node:
         self.children = []
         self.total_reward = 0
         self.num_times_visited = 0
+        self.already_tried_actions = []
 
     def __str__(self):
         s = "Node: "
@@ -41,6 +42,7 @@ class Node:
         child_node.parent = self
         child_node.name = self.name + "_" + str(child_node.move_that_derived_this_node())
         self.children.append(child_node)
+        self.already_tried_actions.append(action)
         return child_node
 
     def move_that_derived_this_node(self):

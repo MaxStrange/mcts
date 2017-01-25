@@ -28,11 +28,6 @@ def _uct_search(game_state, reward_function):
     root = Node(game_state)
     root.name = "root"
 
-    # TODO: First, check if there is a way to win immediately
-    # if so, that's obviously the best move, so take it
-    # TODO: If the opponent is about to win, you should take whatever
-    # option you have to block him
-
     start_time = process_time()
     while _within_computational_budget(start_time):
         v = _tree_policy(root)
@@ -90,10 +85,12 @@ def _best_child(v, c):
     assert(False)
 
 
-def _choose_untried_action_from(available_actions):
+def _choose_untried_action_from(available_actions, already_chosen_actions):
     # This is one place to put a neural network: we need a good way
     # of choosing an untried action, rather than just uniform random
-    return random.choice(available_actions)
+    actions_to_choose_from =\
+            [a for a in available_actions if a not in already_chosen_actions]
+    return random.choice(actions_to_choose_from)
 
 
 def _default_policy(game_state, reward_function):
@@ -120,7 +117,9 @@ def _delta_function(delta, v):
 
 def _expand(v):
     available_actions = v.available_actions()
-    action_to_try = _choose_untried_action_from(available_actions)
+    already_tried = v.already_tried_actions
+    action_to_try =\
+            _choose_untried_action_from(available_actions, already_tried)
     v_prime = v.derive_child(action_to_try)
     return v_prime
 
