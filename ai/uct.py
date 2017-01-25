@@ -16,7 +16,7 @@ def get_best_move(cur_state, reward_function):
     Gets the AI's best move. Or at least, gets what it thinks is its
     best move.
     The reward_runction parameter is a function that evaluates a terminal
-    board position (a game over gamestate) and returns a value in the interval
+    board position (a game-over gamestate) and returns a value in the interval
     [0, 1], where lower values indicate a bad outcome for the AI, and higher
     values indicated a good outcome for the AI.
     Note that this function is only ever evaluated on TERMINAL game states,
