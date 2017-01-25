@@ -28,11 +28,9 @@ def _uct_search(game_state, reward_function):
     root = Node(game_state)
     root.name = "root"
 
-    start_time = process_time()
-    while _within_computational_budget(start_time):
-        v = _tree_policy(root)
-        delta = _default_policy(v.state, reward_function)
-        _back_up(v, delta)
+    best_child_of_root = _search_helper(root, reward_function)
+    while _child_is_not_most_visited(best_child_of_root, root):
+        best_child_of_root = _search_helper(root, reward_function)
 
     # This will usually, but not always, return the action that leads
     # to the child with the highest reward. It COULD (since Cp is set
@@ -41,12 +39,25 @@ def _uct_search(game_state, reward_function):
     # one possible improvement is to check if the most visited root
     # action is not also the one with the highest reward, and if it isn't,
     # keep searching.
-    best_child_of_root = _best_child(root, 0)
     best_move = best_child_of_root.move_that_derived_this_node()
     return best_move
 
+def _search_helper(root, reward_function):
+    start_time = process_time()
+    while _within_computational_budget(start_time):
+        v = _tree_policy(root)
+        delta = _default_policy(v.state, reward_function)
+        _back_up(v, delta)
+    best_child_of_root = _best_child(root, 0)
+    return best_child_of_root
 
-
+def _child_is_not_most_visited(child, root):
+    children = root.children
+    for c in children:
+        if c is not child:
+            if c.num_times_visited > child.num_times_visited:
+                return True
+    return False
 
 
 
@@ -77,6 +88,13 @@ def _best_child(v, c):
     values_and_nodes = [(valfunc(v_prime, v), v_prime) for v_prime\
             in v.children]
     max_tup = max(values_and_nodes, key=lambda tup: tup[0])
+
+    #if c is 0:
+    #    print("Scanning for best move.......")
+    #    for v_and_n in values_and_nodes:
+    #        print("Node value and num_times_visited: ", str((v_and_n[0], v_and_n[1].num_times_visited)))
+    #    print("Decided best move's value is: ", str(max_tup[0]))
+
     for tup in values_and_nodes:
         if tup == max_tup:
             return tup[1]
