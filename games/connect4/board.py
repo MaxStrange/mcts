@@ -74,7 +74,8 @@ class Board:
                     num_in_a_row += 1
                 else:
                     last_seen = spot
-                if num_in_a_row >= 3:
+                    num_in_a_row = 1
+                if num_in_a_row >= 4:
                     return True, last_seen
         return False, ' '
 
