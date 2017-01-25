@@ -19,7 +19,7 @@ class Board:
     def __str__(self):
         nl = os.linesep
         s = nl
-        for row in self._rows:
+        for row in reversed(self._rows):
             row_str = ""
             for spot in row:
                 if spot == ' ':
@@ -36,8 +36,7 @@ class Board:
         """
         assert(symbol == 'x' or symbol == 'o')
         assert(self.valid_move(move))
-
-        r = _find_row_from_col(move)
+        r = self._find_row_from_col(move)
         self._rows[r][move] = symbol
 
     def four_in_a_row(self):
@@ -68,11 +67,11 @@ class Board:
             num_in_a_row = 0
             last_seen = None
             for spot in row_col_or_diag:
-                if spot == last_seen:
+                if spot == last_seen and spot != ' ':
                     num_in_a_row += 1
                 else:
                     last_seen = spot
-                if num_in_a_row >= 4:
+                if num_in_a_row >= 3:
                     return True, last_seen
         return False, ' '
 

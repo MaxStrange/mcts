@@ -88,9 +88,11 @@ class GameState:
         # we just need to check if it makes sense as a column index.
         try:
             item = int(info)
-            if not self.valid_move(item):
+            if not self._board.valid_move(item):
                 return False, "Please enter a valid column between 0 and 6 "\
                         "that isn't full."
+            else:
+                return True, ""
         except ValueError:
             return False, "Please enter a valid column between 0 and 6"
 
