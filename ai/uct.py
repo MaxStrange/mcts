@@ -8,7 +8,6 @@ import copy
 import math
 import random
 from time import process_time
-import treelib
 
 
 def get_best_move(cur_state, reward_function):
@@ -29,26 +28,16 @@ def _uct_search(game_state, reward_function):
     root = Node(game_state)
     root.name = "root"
 
-    debug = False
-    if debug:
-        tree = treelib.Tree()
-        tree.create_node(str(game_state), root.name)
+    # TODO: First, check if there is a way to win immediately
+    # if so, that's obviously the best move, so take it
+    # TODO: If the opponent is about to win, you should take whatever
+    # option you have to block him
 
     start_time = process_time()
     while _within_computational_budget(start_time):
         v = _tree_policy(root)
-
-        if debug:
-            try:
-                tree.create_node(str(v.state), v.name, parent=v.parent.name)
-            except treelib.tree.DuplicatedNodeIdError:
-                pass
-
         delta = _default_policy(v.state, reward_function)
         _back_up(v, delta)
-
-    if debug:
-        tree.show()
 
     # This will usually, but not always, return the action that leads
     # to the child with the highest reward. It COULD (since Cp is set
