@@ -6,6 +6,9 @@ import os
 class Board:
     """
     This class represents the game's board.
+
+    IMPORTANT:
+    A board has its rows indexed from 0, starting from the BOTTOM.
     """
     def __init__(self):
         self._rows = []
@@ -14,12 +17,17 @@ class Board:
             self._rows.append(row)
 
     def __str__(self):
-        s = os.linesep
+        nl = os.linesep
+        s = nl
         for row in self._rows:
             row_str = ""
             for spot in row:
-                row_str += spot
-            s += row_str + os.linesep
+                if spot == ' ':
+                    row_str += "|___"
+                else:
+                    row_str += "|_" + spot + "_"
+            row_str += "|" + nl
+            s += row_str
         return s
 
     def place(self, move, symbol):
@@ -29,8 +37,8 @@ class Board:
         assert(symbol == 'x' or symbol == 'o')
         assert(self.valid_move(move))
 
-        r, c = move
-        self._rows[r][c] = symbol
+        r = _find_row_from_col(move)
+        self._rows[r][move] = symbol
 
     def four_in_a_row(self):
         """
@@ -53,23 +61,27 @@ class Board:
         """
         Checks the given row, col tuple for validity in the game board.
         """
-        r, c = move
-        try:
-            spot = self._rows[r][c]
-            return spot == ' '
-        except IndexError:
-            return False
+        return not self._column_is_full(move)
 
     def _check_for_four(self, ls):
         for row_col_or_diag in ls:
-            s = 0
+            num_in_a_row = 0
+            last_seen = None
             for spot in row_col_or_diag:
-                s += self._evaluate(spot)
-            if s is 3:
-                return True, 'x'
-            elif s is -3:
-                return True, 'o'
+                if spot == last_seen:
+                    num_in_a_row += 1
+                else:
+                    last_seen = spot
+                if num_in_a_row >= 4:
+                    return True, last_seen
         return False, ' '
+
+    def _column_is_full(self, col_index):
+        column = [row[col_index] for row in self._rows]
+        for spot in column:
+            if spot == ' ':
+                return False
+        return True
 
     def _cols(self):
         for i in range(7):
@@ -82,18 +94,18 @@ class Board:
         for j in range(-2, 3):
             yield [self._rows[i][i + j] for i in range(len(self._rows))]
 
-    def _evaluate(self, spot):
+    def _find_row_from_col(self, col_index):
         """
-        Evaluates a spot, giving a 1 if it is an 'x', a -1 if it is an 'o' and
-        a 0 if it is neither.
+        Finds the right row from the given column
         """
-        if spot == 'x':
-            return 1
-        elif spot == 'o':
-            return -1
-        else:
-            return 0
+        column = [row[col_index] for row in self._rows]
+        for i, spot in enumerate(column):
+            # Looking from the bottom row up
+            if spot == ' ':
+                return i
 
+        # If it ever gets here, this function is not implemented correctly
+        assert(False)
 
 
 
