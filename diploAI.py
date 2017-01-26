@@ -32,13 +32,17 @@ def _uct_search(game_state, reward_function):
     while _child_is_not_most_visited(best_child_of_root, root):
         best_child_of_root = _search_helper(root, reward_function)
 
-    # This will usually, but not always, return the action that leads
-    # to the child with the highest reward. It COULD (since Cp is set
-    # to zero for this call) return the node that is most visited instead.
-    # This is often the node that is the best, but not always. So,
-    # one possible improvement is to check if the most visited root
-    # action is not also the one with the highest reward, and if it isn't,
-    # keep searching.
+    # You would now have a best_child_of_root that is really the
+    # most likely child to occur. At this point, that child is of
+    # low resolution attack/defend orders, but it would need
+    # to somehow resolve these into actual orders,
+    # then it should optimize its own orders according to the now
+    # 'perfect' information it has of the next move (i.e., what it
+    # believes everyone else is going to do)
+    # Probably it would be best if it actually gets the top two or three
+    # most likely next game states rather than simply one,
+    # and then it should choose orders that work best against both
+    # (or all three) of these possibilities.
     best_move = best_child_of_root.move_that_derived_this_node()
     return best_move
 
@@ -105,20 +109,16 @@ def _best_child(v, c):
     assert(False)
 
 
-def _choose_untried_action_from(available_actions, already_chosen_actions):
-    # This is one place to put a neural network: we need a good way
-    # of choosing an untried action, rather than just uniform random
-    actions_to_choose_from =\
-            [a for a in available_actions if a not in already_chosen_actions]
-    return random.choice(actions_to_choose_from)
-
-
 def _default_policy(game_state, reward_function):
     while not game_state.game_over():
         # This function should be replaced with the policy network
         action = random.choice(game_state.possible_moves())
         game_state = copy.deepcopy(game_state)
         game_state.take_turn(action)
+    # IMPORTANT: The reward function would need to return a value close to 1
+    # for terminal game states that maximize ALL PLAYERS' victories, otherwise
+    # uct will keep returning game states where it does something smart while
+    # everyone else does something stupid - which is obviously not going to happen
     return reward_function(game_state)
 
 
@@ -136,20 +136,41 @@ def _delta_function(delta, v):
 
 
 def _expand(v):
-    available_actions = v.available_actions()
-    already_tried = v.already_tried_actions
-    action_to_try =\
-            _choose_untried_action_from(available_actions, already_tried)
-    v_prime = v.derive_child(action_to_try)
-    return v_prime
+    got_one, action_set_to_try = _try_to_get_untried_action_set(v)
+    if got_one:
+        # This function would need some way of approximating the units'
+        # new position, given that the action set is merely attack/defend
+        return v.derive_child(action_set_to_try)
+    else:
+        return False, None
+
+
+def _try_to_get_untried_action_set(v):
+    TRIES = 100 # let's say
+    for i in range(TRIES):
+        # This function randomly generates an action set from each
+        # unit's odds of selecting attack vs defend
+        # If the action set so generated has already been generated before
+        # by this node, then it returns False, None
+        # otherwise it returns True, action_set
+        got_one, action_set = v.pull_from_most_likekly_action_sets()
+    if got_one:
+        return True, action_set
+    else:
+        v.is_fully_expanded = True
+        return False, None
 
 
 def _tree_policy(v):
     # This value of Cp works for rewards in the range of [0, 1]
     Cp = 1 / math.sqrt(2)
     while v.is_non_terminal():
-        if v.is_not_fully_expanded():
-            return _expand(v)
+        if not v.is_fully_expanded:
+            worked, new_node = _expand(v)
+            if worked:
+                return new_node
+            else:
+                v = _best_child(v, Cp)
         else:
             v = _best_child(v, Cp)
     return v
